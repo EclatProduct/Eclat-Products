@@ -1,0 +1,38 @@
+        public async Task<JsonResult> GetResultAsync(string UPC)
+        {
+            var product = ConnectDatabaseProducts.CheckProductAlreadyExist(UPC);
+            if (product == 0)
+            {
+                string Token = "Your API Key";
+                var Url = "https://secure.eclatproduct.com/api/products/" + UPC + '/' + Token;
+                using (HttpClient client = new HttpClient())
+                {
+
+                    try
+                    {
+                        string response = await client.GetStringAsync(Url);
+
+                        if (response != null)
+                        {
+                            return Json(new { result = true, data = response}, JsonRequestBehavior.AllowGet);
+                        }
+                        else
+                        {
+                            return Json(new { result = false, data = "No product found with UPC" }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        return Json(new { result = false, data = "UPC searcher is not responding" }, JsonRequestBehavior.AllowGet);
+                    }
+
+                }
+            }
+            else
+            {
+                return Json(new { result = false, data = "", type = 4 }, JsonRequestBehavior.AllowGet);
+            }
+
+            //HttpClient client = new HttpClient();
+
+        }
